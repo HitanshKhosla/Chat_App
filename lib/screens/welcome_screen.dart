@@ -1,7 +1,7 @@
 import 'package:flash_chat/screens/login_screen.dart';
 import 'registartaion_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const String id="welcome_screen";
@@ -48,16 +48,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                   tag: 'logo',
                   child: Container(
                     child: Image.asset('images/logo.png'),
-                    height: controller!.value*100,
+                    height: controller!.value * 100,
                   ),
                 ),
-                Text(
-                  'Flash Chat',
-                  style: TextStyle(
-                    fontSize: 45.0,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
+                AnimatedTextKit(repeatForever: true, animatedTexts: [
+                  FlickerAnimatedText(
+                    "Flash Chat",
+                    textStyle: TextStyle(
+                      fontSize: 45.0,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  )
+                ]),
               ],
             ),
             SizedBox(
