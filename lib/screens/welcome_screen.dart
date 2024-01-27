@@ -1,4 +1,5 @@
 import 'package:flash_chat/screens/login_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'registartaion_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
@@ -9,21 +10,24 @@ class WelcomeScreen extends StatefulWidget {
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProviderStateMixin{
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with TickerProviderStateMixin {
   AnimationController? controller;
-  Animation ?animation;
+  Animation? animation;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller= AnimationController(
-      duration: Duration(seconds: 1),
-        vsync: this,
+    controller = AnimationController(
+      duration: Duration(seconds: 1, milliseconds: 25),
+      vsync: this,
     );
-    animation=CurvedAnimation(parent: controller!, curve:Curves.elasticInOut);
+    animation = ColorTween(begin: CupertinoColors.systemGrey4, end: Colors.grey)
+        .animate(controller!);
     controller!.forward();
-    controller!.addListener(() {setState(() {
-    });
+    controller!.addListener(() {
+      setState(() {});
     });
   }
   @override
@@ -35,7 +39,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
   }
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.withOpacity(controller!.value),
+      backgroundColor: animation!.value,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
