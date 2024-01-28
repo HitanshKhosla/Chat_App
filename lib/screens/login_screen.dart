@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen>
             Hero(
               tag: "logo",
               child: Container(
-                height: 200.0,
+                height: controller!.value * 150,
                 child: Image.asset('images/logo.png'),
               ),
             ),
