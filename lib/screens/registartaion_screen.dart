@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/components/round_button.dart';
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  static const String id = "registration";
+  static const String id = "registration_screen";
+
+  const RegistrationScreen({super.key});
 
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
@@ -11,6 +15,7 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen>
     with SingleTickerProviderStateMixin {
+  final _auth = FirebaseAuth.instance;
   String? email;
   String? password;
   AnimationController? controller;
@@ -75,9 +80,18 @@ class _RegistrationScreenState extends State<RegistrationScreen>
                   SizedBox(
                     height: 24.0,
                   ),
-                  RoundButton('register', Colors.blueAccent, () {
-                    print(password);
-                    print(email);
+                  RoundButton('Register', Colors.blueAccent, () async {
+                    try {
+                      final newUser =
+                          await _auth.createUserWithEmailAndPassword(
+                              email: email.toString(),
+                              password: password.toString());
+
+                      Navigator.pushNamed(context, ChatScreen.id);
+                    } catch (e) {
+                      print(e);
+                    }
+                    ;
                   })
                 ])));
   }

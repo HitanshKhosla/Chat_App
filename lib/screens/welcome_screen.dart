@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'registartaion_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  static const String id="welcome_screen";
+  static const String id = "welcome_screen";
+
   @override
   _WelcomeScreenState createState() => _WelcomeScreenState();
 }
@@ -31,12 +32,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       setState(() {});
     });
   }
+
   @override
   void dispose() {
     super.dispose();
     controller!.dispose();
-
   }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: animation!.value,
@@ -81,4 +83,3 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
-
