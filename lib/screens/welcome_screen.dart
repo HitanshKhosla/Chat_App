@@ -43,30 +43,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Scaffold(
       backgroundColor: animation!.value,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Hero(
-                  tag: 'logo',
-                  child: Container(
-                    child: Image.asset('images/logo.png'),
-                    height: controller!.value * 100,
-                  ),
-                ),
-                AnimatedTextKit(repeatForever: true, animatedTexts: [
-                  FlickerAnimatedText(
-                    "Flash Chat",
-                    textStyle: TextStyle(
-                      fontSize: 45.0,
-                      fontWeight: FontWeight.w900,
+            Flexible(
+              child: Row(
+                children: <Widget>[
+                  Hero(
+                    tag: 'logo',
+                    child: Container(
+                      child: Image.asset('images/logo.png'),
+                      height: controller!.value * 100,
                     ),
-                  )
-                ]),
-              ],
+                  ),
+                  AnimatedTextKit(repeatForever: true, animatedTexts: [
+                    FlickerAnimatedText(
+                      "Flash Chat",
+                      textStyle: TextStyle(
+                        fontSize: 45.0,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    )
+                  ]),
+                ],
+              ),
             ),
             SizedBox(
               height: 48.0,

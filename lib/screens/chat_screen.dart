@@ -17,13 +17,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCurrentUser();
+    // getCurrentUser();
   }
 
   void getCurrentUser() async {
     try {
-      User? user = await _auth.currentUser;
-      user ??= LoggedIn;
+      LoggedIn = await _auth.currentUser;
     } catch (e) {
       print(e);
     }
@@ -38,7 +37,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                //Implement logout functionality
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
