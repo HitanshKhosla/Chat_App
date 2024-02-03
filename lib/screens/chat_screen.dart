@@ -20,7 +20,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // getCurrentUser();
+    getCurrentUser();
   }
 
   void getCurrentUser() async {
@@ -28,6 +28,14 @@ class _ChatScreenState extends State<ChatScreen> {
       LoggedIn = await _auth.currentUser;
     } catch (e) {
       print(e);
+    }
+  }
+
+  void messageStream() async {
+    await for (var snapshot in _fireStore.collection("messages").snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
     }
   }
 
@@ -40,8 +48,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                _auth.signOut();
-                Navigator.pop(context);
+                // _auth.signOut();
+                // Navigator.pop(context);
+                messageStream();
               }),
         ],
         title: Text('⚡️Chat'),
@@ -67,9 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      _fireStore
-                          .collection("message")
-                          .add({'text': messageText, 'user': LoggedIn!.email});
+                      _fireStore.collection("message").add(
+                          {'text': messageText, 'user': LoggedIn?.email ?? ""});
                     },
                     child: Text(
                       'Send',
