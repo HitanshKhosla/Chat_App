@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flutter/material.dart';
 
+User? LoggedIn;
+
 class ChatScreen extends StatefulWidget {
   static const String id = "chat_screen";
 
@@ -12,7 +14,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _auth = FirebaseAuth.instance;
-  User? LoggedIn;
+
   final _fireStore = FirebaseFirestore.instance;
   String? messageText;
   final textfieldcontroller = TextEditingController();
@@ -32,14 +34,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void messageStream() async {
-    await for (var snapshot in _fireStore.collection("messages").snapshots()) {
-      for (var message in snapshot.docs) {
-        print(message.data());
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,9 +43,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                // _auth.signOut();
-                // Navigator.pop(context);
-                messageStream();
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
@@ -112,17 +105,23 @@ class Stream extends StatelessWidget {
         stream: _fireStore.collection('messages').snapshots(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
-            final message = snapshot.data.docs;
+            final message = snapshot.data.docs.reversed;
             List<RoundBubble> messageWidgets = [];
             for (var messages in message) {
               final messageText = messages.data()['text'];
               final messageSender = messages.data()['user'];
+              final currentUser = LoggedIn?.email.toString();
               final messageWidget = RoundBubble(
-                  messagetext: messageText, messagesender: messageSender);
+                  messagetext: messageText,
+                  messagesender: messageSender,
+                  isMe: currentUser == messageSender);
               messageWidgets.add(messageWidget);
             }
             return Expanded(
-              child: ListView(children: messageWidgets),
+              child: ListView(
+                children: messageWidgets,
+                reverse: true,
+              ),
             );
           }
           return CircularProgressIndicator(
@@ -135,31 +134,43 @@ class Stream extends StatelessWidget {
 class RoundBubble extends StatelessWidget {
   final String? messagetext;
   final String? messagesender;
+  final bool isMe;
 
-  RoundBubble({this.messagetext, this.messagesender}) {}
+  RoundBubble({this.messagetext, this.messagesender, required this.isMe}) {}
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(10.0),
-      child:
-          Column(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
-        Text(
-          '$messagesender',
-          style: TextStyle(fontSize: 12.0, color: Colors.black54),
-        ),
-        Material(
-          borderRadius: BorderRadius.circular(30.0),
-          child: Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Text(
-              "$messagetext",
-              style: TextStyle(color: Colors.white, fontSize: 15.0),
+      child: Column(
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          children: <Widget>[
+            Text(
+              '$messagesender',
+              style: TextStyle(
+                  fontSize: 12.0, color: isMe ? Colors.grey : Colors.white),
             ),
-          ),
-          elevation: 10.0,
-          color: Colors.blue,
-        ),
+            Material(
+              borderRadius: isMe
+                  ? BorderRadius.only(
+                      topRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30.0),
+                      bottomRight: Radius.circular(30.0))
+                  : BorderRadius.only(
+                      topRight: Radius.circular(30.0),
+                      bottomLeft: Radius.circular(30.0),
+                      bottomRight: Radius.circular(30.0)),
+              child: Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  "$messagetext",
+                  style: TextStyle(color: Colors.white, fontSize: 15.0),
+                ),
+              ),
+              elevation: 10.0,
+              color: Colors.blue,
+            ),
       ]),
     );
   }
