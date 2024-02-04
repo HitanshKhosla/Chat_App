@@ -15,6 +15,7 @@ class _ChatScreenState extends State<ChatScreen> {
   User? LoggedIn;
   final _fireStore = FirebaseFirestore.instance;
   String? messageText;
+  final textfieldcontroller = TextEditingController();
 
   @override
   void initState() {
@@ -25,7 +26,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void getCurrentUser() async {
     try {
-      LoggedIn = await _auth.currentUser;
+      LoggedIn = _auth.currentUser;
     } catch (e) {
       print(e);
     }
@@ -61,6 +62,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Stream(fireStore: _fireStore),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -68,6 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      controller: textfieldcontroller,
                       onChanged: (value) {
                         messageText = value;
                       },
@@ -76,6 +79,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   TextButton(
                     onPressed: () {
+                      textfieldcontroller.clear();
                       _fireStore.collection("message").add(
                           {'text': messageText, 'user': LoggedIn?.email ?? ""});
                     },
@@ -90,6 +94,71 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class Stream extends StatelessWidget {
+  const Stream({
+    super.key,
+    required FirebaseFirestore fireStore,
+  }) : _fireStore = fireStore;
+
+  final FirebaseFirestore _fireStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: _fireStore.collection('messages').snapshots(),
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            final message = snapshot.data.docs;
+            List<RoundBubble> messageWidgets = [];
+            for (var messages in message) {
+              final messageText = messages.data()['text'];
+              final messageSender = messages.data()['user'];
+              final messageWidget = RoundBubble(
+                  messagetext: messageText, messagesender: messageSender);
+              messageWidgets.add(messageWidget);
+            }
+            return Expanded(
+              child: ListView(children: messageWidgets),
+            );
+          }
+          return SizedBox();
+        });
+  }
+}
+
+class RoundBubble extends StatelessWidget {
+  final String? messagetext;
+  final String? messagesender;
+
+  RoundBubble({this.messagetext, this.messagesender}) {}
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child:
+          Column(crossAxisAlignment: CrossAxisAlignment.end, children: <Widget>[
+        Text(
+          '$messagesender',
+          style: TextStyle(fontSize: 12.0, color: Colors.black54),
+        ),
+        Material(
+          borderRadius: BorderRadius.circular(30.0),
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              "$messagetext",
+              style: TextStyle(color: Colors.white, fontSize: 15.0),
+            ),
+          ),
+          elevation: 10.0,
+          color: Colors.blue,
+        ),
+      ]),
     );
   }
 }
