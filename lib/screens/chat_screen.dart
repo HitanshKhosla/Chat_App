@@ -125,7 +125,9 @@ class Stream extends StatelessWidget {
               child: ListView(children: messageWidgets),
             );
           }
-          return SizedBox();
+          return CircularProgressIndicator(
+            color: Colors.lightBlueAccent,
+          );
         });
   }
 }
